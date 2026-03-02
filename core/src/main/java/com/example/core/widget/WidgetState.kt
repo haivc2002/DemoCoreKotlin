@@ -2,7 +2,6 @@ package com.example.core.widget
 
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
-import com.example.core.api.ApiResult
 
 /**
  * A generic UI handler for displaying different UI states (Loading, Success, Error).
@@ -21,16 +20,15 @@ import com.example.core.api.ApiResult
  * )
  * ```
  */
-
 @Composable
 fun <T> WidgetState(
     state: StateApi<T>,
     onLoading: @Composable () -> Unit = { CircularProgressIndicator() },
     onSuccess: @Composable (T) -> Unit,
-    onError: @Composable (Int) -> Unit
+    onError: @Composable (Any) -> Unit
 ) {
     when (state) {
-        is StateApi.Failure -> onError(state.code)
+        is StateApi.Failure -> onError(state.coreOrMes)
         StateApi.Loading -> onLoading()
         is StateApi.Success -> onSuccess(state.data)
     }
@@ -70,8 +68,7 @@ open class StateApi<out T> {
      * @param message Optional error message for debugging or display.
      */
     data class Failure(
-        val code: Int,
-        val message: String? = null
+        val coreOrMes: Any
     ) : StateApi<Nothing>()
 }
 

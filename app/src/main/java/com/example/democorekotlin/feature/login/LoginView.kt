@@ -6,29 +6,29 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.democorekotlin.LoginUiState
+import com.example.core.base.BaseView
 
-class LoginView {
+class LoginView : BaseView<LoginViewModel>() {
     companion object {
         const val ROUTER: String = "LoginView"
     }
 
-
     @Composable
-    fun BuildRender() {
-
-        val viewModel = hiltViewModel<LoginViewModel>()
-
+    override fun BuildRender() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -48,19 +48,36 @@ class LoginView {
                     value = viewModel.password,
                     onValueChange = { viewModel.password = it },
                     label = { Text("Password") },
-                    visualTransformation = PasswordVisualTransformation(),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    visualTransformation = if (viewModel.showPassword)
+                        VisualTransformation.None
+                    else
+                        PasswordVisualTransformation(),
+                    trailingIcon = {
+                        val image = if (viewModel.showPassword)
+                            Icons.Default.Visibility
+                        else
+                            Icons.Default.VisibilityOff
+                        val description = if (viewModel.showPassword)
+                            "Hide password"
+                        else
+                            "Show password"
+                        IconButton(onClick = { viewModel.showPassword = !viewModel.showPassword }) {
+                            Icon(
+                                imageVector = image,
+                                contentDescription = description
+                            )
+                        }
+                    }
+
                 )
                 Button(
                     onClick = { viewModel.onLogin() },
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = viewModel.uiState !is LoginUiState.Loading
+//                    enabled = viewModel.uiState !is LoginUiState.Loading
                 ) {
                     Text("Login")
                 }
-            }
-            if (viewModel.uiState is LoginUiState.Loading) {
-                CircularProgressIndicator()
             }
         }
     }

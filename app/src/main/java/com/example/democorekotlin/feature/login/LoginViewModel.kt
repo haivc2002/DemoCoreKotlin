@@ -3,39 +3,46 @@ package com.example.democorekotlin.feature.login
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.api.ApiResult
-import com.example.democorekotlin.LoginUiState
+import com.example.core.base.BaseNavigator.pushReplacementNamed
+import com.example.core.base.BaseViewModel
+import com.example.core.common.ECWidget
+import com.example.core.datastore.DataStorage
+import com.example.democorekotlin.feature.atin.main.AtinMainView
+import com.example.democorekotlin.model.request.RequestLogin
 import com.example.democorekotlin.network.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val repository: Repository
-) : ViewModel() {
+    private val repository: Repository,
+    private val dataStorage: DataStorage,
+) : BaseViewModel() {
 
-    private val _uiState = MutableStateFlow<LoginUiState>(LoginUiState.Idle)
-    val uiState: StateFlow<LoginUiState> = _uiState
-
-    var phone by mutableStateOf("0865831896")
-    var password by mutableStateOf("123456")
+    var phone by mutableStateOf("haibt_uat")
+    var password by mutableStateOf("Atin@2026")
+    var showPassword by mutableStateOf(false)
 
     fun onLogin() {
         viewModelScope.launch {
-            _uiState.value = LoginUiState.Loading
-            when (val result = repository.loginApi(phone, password)) {
+            overlay.openLoading()
+            val response = repository.loginApi(RequestLogin(phone, password))
+            overlay.dismiss()
+            when (response) {
                 is ApiResult.Success -> {
-                    _uiState.value = LoginUiState.Success(result.value)
+                    val token = response
+                        .value.data
+                        ?.accessToken ?: ""
+                    dataStorage.write("TOKEN_KEY",  token)
+                    pushReplacementNamed(AtinMainView.ROUTER)
                 }
                 is ApiResult.Failure -> {
-                    _uiState.value = LoginUiState.Error(
-                        "${result.message} + ${result.errorCode}" ?: "Có lỗi xảy ra"
-                    )
+                    overlay.dialog({
+                        ECWidget(response.errorCode)
+                    })
                 }
             }
         }
