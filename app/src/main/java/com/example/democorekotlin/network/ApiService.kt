@@ -3,7 +3,6 @@ package com.example.democorekotlin.network
 import com.example.core.api.NoAuthenticationRequired
 import com.example.democorekotlin.model.request.*
 import com.example.democorekotlin.model.response.*
-import retrofit2.Response
 import retrofit2.http.*
 
 interface ApiService {
@@ -11,17 +10,17 @@ interface ApiService {
     @POST("login")
     suspend fun loginAPI(
         @Body request: RequestLogin
-    ): Response<ModelLogin>
+    ): ModelLogin
 
     @GET("checkInHistory")
     suspend fun checkInHistoryAPI(
         @Query("fromTime", encoded = true) fromTime: String,
         @Query("toTime", encoded = true) toTime: String,
         @Query("status") status: Int = 1,
-    ): Response<ModelListCheckIn>
+    ): ModelListCheckIn
 
     @GET("userInfo")
-    suspend fun userInfoAPI(): Response<ModelInfo>
+    suspend fun userInfoAPI(): ModelInfo
 
     @NoAuthenticationRequired
     @GET("https://api.openweathermap.org/data/2.5/weather")
@@ -29,7 +28,7 @@ interface ApiService {
         @Query("lat") lat: String,
         @Query("lon") lon: String,
         @Query("appid") appid: String = "f564d22bfddbc8aa0d01af2db4eedb1b",
-    ) : Response<ModelWeather>
+    ) : ModelWeather
 
     @NoAuthenticationRequired
     @GET("https://api-bdc.io/data/reverse-geocode-client")
@@ -37,21 +36,21 @@ interface ApiService {
         @Query("latitude") lat: String,
         @Query("longitude") lon: String,
         @Query("localityLanguage") localityLanguage: String = "vi",
-    ) : Response<ModelCurrentLocation>
+    ) : ModelCurrentLocation
 
     @GET("timeKeepingHistory")
     suspend fun timeKeepingHistoryAPI(
         @Query("fromDate") fromDate: String,
         @Query("toDate") toDate: String,
-    ) : Response<ModelTimekeeping>
+    ) : ModelTimekeeping
 
     @POST("changePassword")
     suspend fun changePasswordAPI(
         @Body request: RequestChangePass
-    ) : Response<String>
+    ) : String
 
     @POST("checkinFace")
     suspend fun checkinFaceAPI(
         @Body request: RequestCheckInFace
-    ) : Response<Boolean>
+    ) : Boolean
 }

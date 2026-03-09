@@ -18,7 +18,7 @@ class ApiLogger(
     private val showResponseHeader: Boolean = false,
     private val showError: Boolean = true,
     private val maxWidth: Int = 110,
-    private val compact: Boolean = true
+    private val compact: Boolean = false
 ) : Interceptor {
 
     companion object {

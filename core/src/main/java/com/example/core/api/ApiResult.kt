@@ -30,7 +30,8 @@ sealed class ApiResult<out T> {
      */
     data class Failure(
         val errorCode: Int,
-        val message: String? = null
+        val message: String? = null,
+        val exception: Throwable? = null
     ) : ApiResult<Nothing>()
 
     companion object {

@@ -7,17 +7,16 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import kotlin.reflect.full.createInstance
+import com.example.core.base.BaseNavigator.ConfigViewNavigator
+import com.example.core.base.BaseNavigator.navController
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
 
 /**
  * BaseNavigator - Global navigation manager for Compose applications
@@ -28,6 +27,7 @@ import kotlin.reflect.full.createInstance
  * @property navController NavController initialized by [ConfigViewNavigator]
  */
 object BaseNavigator {
+    val globalOverlay = BaseOverlay()
     /**
      * Internal NavController to manage the navigation stack
      * Automatically initialized when calling [ConfigViewNavigator]
@@ -328,7 +328,8 @@ object BaseNavigator {
     ) {
         val navController = rememberNavController()
         this.navController = navController
-        NavHost(
+        Box(modifier = Modifier.fillMaxSize()) {
+            NavHost(
             navController = navController,
             startDestination = startPage,
             enterTransition = {
@@ -362,77 +363,9 @@ object BaseNavigator {
                 )
             }
         ) { builder() }
-    }
-
-    /**
-     * Initialize and configure a screen (View) with its corresponding ViewModel and Overlay
-     * 
-     * This function automatically:
-     * - Creates a View instance using reflection
-     * - Injects ViewModel using Hilt
-     * - Creates BaseOverlay to manage overlays (dialog, loading, etc.)
-     * - Connects View, ViewModel, and Overlay together
-     * - Renders View and overlays on the screen
-     * 
-     * @param VM Generic type of ViewModel, must extend [BaseViewModel]
-     * @param V Generic type of View, must extend [BaseView]
-     * 
-     * Requirements:
-     * - ViewModel must be registered with Hilt (@HiltViewModel)
-     * - View must have a no-argument constructor
-     * - View must extend BaseView<VM>
-     * - ViewModel must extend BaseViewModel
-     * 
-     * Example in NavGraphBuilder:
-     * ```kotlin
-     * // Define routes in ConfigViewNavigator
-     * composable(LoginView.ROUTER) {
-     *     ConfigView<LoginViewModel, LoginView>()
-     * }
-     * 
-     * composable(HomeView.ROUTER) {
-     *     ConfigView<HomeViewModel, HomeView>()
-     * }
-     * ```
-     * 
-     * Example View and ViewModel definition:
-     * ```kotlin
-     * @HiltViewModel
-     * class LoginViewModel @Inject constructor() : BaseViewModel() {
-     *     // ViewModel logic
-     * }
-     * 
-     * class LoginView : BaseView<LoginViewModel>() {
-     *     companion object {
-     *         const val ROUTER = "login"
-     *     }
-     *     
-     *     @Composable
-     *     override fun BuildRender() {
-     *         // UI composable
-     *         Column {
-     *             Text("Login Screen")
-     *             Button(onClick = {
-     *                 pushNamed(HomeView.ROUTER)
-     *             }) {
-     *                 Text("Login")
-     *             }
-     *         }
-     *     }
-     * }
-     * ```
-     */
-    @Composable
-    inline fun <reified VM : BaseViewModel, reified V : BaseView<VM>> ConfigView() {
-        val view: V = V::class.createInstance()
-        val viewModel = hiltViewModel<VM>()
-        val overlay = remember { BaseOverlay() }
-        view.viewModel = viewModel
-        view.overlay = overlay
-        viewModel.overlay = overlay
-        Box(Modifier.fillMaxSize()) {
-            view.BuildRender()
-            overlay.overlays.forEach { it() }
+            globalOverlay.overlays.forEach { overlay ->
+                overlay()
+            }
         }
     }
 }

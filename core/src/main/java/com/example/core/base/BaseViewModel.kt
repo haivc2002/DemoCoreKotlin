@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.example.core.common.PrintLog
 
 abstract class BaseViewModel : ViewModel() {
-    lateinit var overlay: BaseOverlay
+    val overlay: BaseOverlay = BaseNavigator.globalOverlay
 
     init {
         PrintLog.info("CREATE ${javaClass.simpleName}")

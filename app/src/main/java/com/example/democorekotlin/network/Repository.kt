@@ -1,26 +1,21 @@
 package com.example.democorekotlin.network
 
-import com.example.core.api.ApiHandle
-import com.example.core.api.ApiNetworkModule.createService
 import com.example.core.api.ApiResult
+import com.example.core.base.BaseRepository
 import com.example.democorekotlin.model.request.*
 import com.example.democorekotlin.model.response.*
-import retrofit2.Retrofit
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class Repository @Inject constructor(
-    retrofit: Retrofit,
-    private val apiHandle: ApiHandle,
-) {
-    private val apiService: ApiService = retrofit
-        .createService()
+    private val apiService: ApiService
+) : BaseRepository() {
 
     suspend fun loginApi(
         request: RequestLogin
     ) : ApiResult<ModelLogin> {
-        return apiHandle.handleApiCall {
+        return execute {
             apiService.loginAPI(request)
         }
     }
@@ -29,13 +24,13 @@ class Repository @Inject constructor(
         fromTime: String,
         toTime: String,
     ) : ApiResult<ModelListCheckIn> {
-        return apiHandle.handleApiCall {
+        return execute {
             apiService.checkInHistoryAPI(fromTime, toTime)
         }
     }
 
     suspend fun userInfoApi() : ApiResult<ModelInfo> {
-        return apiHandle.handleApiCall {
+        return execute {
             apiService.userInfoAPI()
         }
     }
@@ -44,7 +39,7 @@ class Repository @Inject constructor(
         lat: String,
         lon: String
     ) : ApiResult<ModelWeather> {
-        return apiHandle.handleApiCall {
+        return execute {
             apiService.weatherAPI(lat, lon)
         }
     }
@@ -53,7 +48,7 @@ class Repository @Inject constructor(
         lat: String,
         lon: String
     ) : ApiResult<ModelCurrentLocation> {
-        return apiHandle.handleApiCall {
+        return execute {
             apiService.currentLocationAPI(lat, lon)
         }
     }
@@ -62,7 +57,7 @@ class Repository @Inject constructor(
         fromDate: String,
         toDate: String
     ) : ApiResult<ModelTimekeeping> {
-        return apiHandle.handleApiCall {
+        return execute {
             apiService.timeKeepingHistoryAPI(fromDate, toDate)
         }
     }
@@ -70,7 +65,7 @@ class Repository @Inject constructor(
     suspend fun changePasswordApi(
         request: RequestChangePass
     ) : ApiResult<String> {
-        return apiHandle.handleApiCall {
+        return execute {
             apiService.changePasswordAPI(request)
         }
     }
@@ -78,7 +73,7 @@ class Repository @Inject constructor(
     suspend fun checkinFaceApi(
         request: RequestCheckInFace
     ) : ApiResult<Boolean> {
-        return apiHandle.handleApiCall {
+        return execute {
             apiService.checkinFaceAPI(request)
         }
     }

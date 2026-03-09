@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -72,7 +73,8 @@ class BaseOverlay {
             Dialog(
                 onDismissRequest = {
                     wrapper?.let { _overlays.remove(it) }
-                }
+                },
+                properties = DialogProperties(usePlatformDefaultWidth = false)
             ) {
                 AppDialog(
                     title = title,
@@ -89,16 +91,11 @@ class BaseOverlay {
      * AppDialog is a custom dialog composable that displays a dialog with a title, body content, and action buttons.
      * 
      * The dialog is designed to:
-     * - Fill the screen width up to a maximum of 450dp
-     * - Apply 20dp horizontal padding on both sides
+     * - Fill 90% of the screen width
+     * - Constrain maximum width to 450dp
      * - Limit height to 55% of screen height (1/1.8)
      * 
-     * IMPORTANT: Modifier order matters for proper width calculation:
-     * 1. fillMaxWidth() - Dialog attempts to take full available width
-     * 2. widthIn(max = 450.dp) - Constrains maximum width to 450dp
-     * 3. padding(horizontal = 20.dp) - Applies 20dp padding on each side
-     * 
-     * This ensures the dialog expands to screen width (minus padding) on smaller devices,
+     * This ensures the dialog adapts to screen width on smaller devices,
      * but never exceeds 450dp on larger devices.
      *
      * @param title Optional title text displayed at the top of the dialog
@@ -114,15 +111,17 @@ class BaseOverlay {
         actions: List<DialogAction> = emptyList(),
         onClose: () -> Unit
     ) {
+        val configuration = LocalConfiguration.current
+        val targetWidth = configuration.screenWidthDp.dp * 0.9f
+        val dialogWidth = if (targetWidth > 450.dp) 450.dp else targetWidth
+
         Surface(
             shape = RoundedCornerShape(20.dp),
             color = Color.White,
             tonalElevation = 0.dp,
             modifier = Modifier
-                .fillMaxWidth()  // Fill available width first
-                .widthIn(max = 450.dp)  // Limit max width to 450dp
-                .padding(horizontal = 20.dp)  // Apply padding after width calculation
-                .heightIn(max = (LocalConfiguration.current.screenHeightDp.dp / 1.8f))
+                .width(dialogWidth)
+                .heightIn(max = (configuration.screenHeightDp.dp / 1.8f))
         ) {
             Column(
                 modifier = Modifier.padding(top = 15.dp, bottom = 5.dp),

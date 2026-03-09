@@ -1,18 +1,29 @@
 package com.example.democorekotlin.network
 
-import com.example.democorekotlin.BuildConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.Interceptor
+import retrofit2.Retrofit
 import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object ApiConfig {
+
+    @Provides
+    @Named("BaseUrl")
+    fun provideBaseUrl(): String = "https://smfapi.atin.vn/gw/api/v1/mobile/"
+
+    @Provides
+    @Named("AuthInterceptor")
+    fun provideAuthInterceptor(): Interceptor? = null
+
     @Provides
     @Singleton
-    @Named("BaseUrl")
-    fun provideBaseUrl(): String = BuildConfig.BASE_URL
+    fun provideApiService(retrofit: Retrofit): ApiService {
+        return retrofit.create(ApiService::class.java)
+    }
 }

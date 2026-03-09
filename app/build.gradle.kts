@@ -17,12 +17,6 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        buildConfigField(
-            "String",
-            "BASE_URL",
-            "\"https://smfapi.atin.vn/gw/api/v1/mobile/\""
-        )
     }
 
     buildTypes {
@@ -43,9 +37,6 @@ android {
         compose = true
         buildConfig = true
     }
-//    kotlinOptions {
-//        freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
-//    }
 }
 
 kotlin {

@@ -20,64 +20,58 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.example.core.base.BaseView
+import androidx.hilt.navigation.compose.hiltViewModel
 
-class LoginView : BaseView<LoginViewModel>() {
-    companion object {
-        const val ROUTER: String = "LoginView"
-    }
-
-    @Composable
-    override fun BuildRender() {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            contentAlignment = Alignment.Center
+@Composable
+fun LoginView(viewModel: LoginViewModel = hiltViewModel()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                OutlinedTextField(
-                    value = viewModel.phone,
-                    onValueChange = { viewModel.phone = it },
-                    label = { Text("Phone") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                OutlinedTextField(
-                    value = viewModel.password,
-                    onValueChange = { viewModel.password = it },
-                    label = { Text("Password") },
-                    modifier = Modifier.fillMaxWidth(),
-                    visualTransformation = if (viewModel.showPassword)
-                        VisualTransformation.None
+            OutlinedTextField(
+                value = viewModel.phone,
+                onValueChange = { viewModel.phone = it },
+                label = { Text("Phone") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = viewModel.password,
+                onValueChange = { viewModel.password = it },
+                label = { Text("Password") },
+                modifier = Modifier.fillMaxWidth(),
+                visualTransformation = if (viewModel.showPassword)
+                    VisualTransformation.None
+                else
+                    PasswordVisualTransformation(),
+                trailingIcon = {
+                    val image = if (viewModel.showPassword)
+                        Icons.Default.Visibility
                     else
-                        PasswordVisualTransformation(),
-                    trailingIcon = {
-                        val image = if (viewModel.showPassword)
-                            Icons.Default.Visibility
-                        else
-                            Icons.Default.VisibilityOff
-                        val description = if (viewModel.showPassword)
-                            "Hide password"
-                        else
-                            "Show password"
-                        IconButton(onClick = { viewModel.showPassword = !viewModel.showPassword }) {
-                            Icon(
-                                imageVector = image,
-                                contentDescription = description
-                            )
-                        }
+                        Icons.Default.VisibilityOff
+                    val description = if (viewModel.showPassword)
+                        "Hide password"
+                    else
+                        "Show password"
+                    IconButton(onClick = { viewModel.showPassword = !viewModel.showPassword }) {
+                        Icon(
+                            imageVector = image,
+                            contentDescription = description
+                        )
                     }
-
-                )
-                Button(
-                    onClick = { viewModel.onLogin() },
-                    modifier = Modifier.fillMaxWidth(),
-//                    enabled = viewModel.uiState !is LoginUiState.Loading
-                ) {
-                    Text("Login")
                 }
+
+            )
+            Button(
+                onClick = { viewModel.onLogin() },
+                modifier = Modifier.fillMaxWidth(),
+//                    enabled = viewModel.uiState !is LoginUiState.Loading
+            ) {
+                Text("Login")
             }
         }
     }
